@@ -1,4 +1,3 @@
-import java.lang.*;
 import java.util.Random;
 
 /**
@@ -8,7 +7,9 @@ import java.util.Random;
 public class DistributionGenerator {
 
     /**
-     * @return
+     * Uses Montecarlo's method to generate the next type of query.
+     *
+     * @return an type of query.
      */
     public static QueryType generateType() {
         Random rnd = new Random();
@@ -29,8 +30,10 @@ public class DistributionGenerator {
     }
 
     /**
-     * @param lambda
-     * @return
+     * Uses the Poisson distribution to generate the time of the next arrival.
+     *
+     * @param lambda Average of arrivals per unit time.
+     * @return The time from the next arrival.
      */
     public static double getNextArrivalTime(double lambda) {
         Random rnd = new Random();
@@ -40,9 +43,11 @@ public class DistributionGenerator {
 
 
     /**
-     * @param a
-     * @param b
-     * @return
+     * Uses the inverse transform sampling with the uniform distribution to generate a random value.
+     *
+     * @param a Is the lowest value.
+     * @param b Is the higer value.
+     * @return A random value belonging to the interval [a , b].
      */
     public static double getNextRandomValueByUniform(double a, double b) {
         Random rnd = new Random();
@@ -52,15 +57,25 @@ public class DistributionGenerator {
 
 
     /**
-     * @param lambda
-     * @return
+     * Uses the inverse transform sampling with the exponential distribution to generate a random value.
+     *
+     * @param lambda Average time between arrivals.
+     * @return A random value.
      */
     public static double getNextRandomValueByExponential(double lambda) {
         Random rnd = new Random();
         double r = rnd.nextDouble();
-        return -Math.log(r)/ (lambda);
+        return -Math.log(r) / (lambda);
     }
 
+
+    /**
+     * Uses the inverse transform sampling with the normal distribution to generate a random value.
+     *
+     * @param average           Param of the median value inside the distribution.
+     * @param standardDeviation Param of the standard deviation inside the distribution.
+     * @return A random value.
+     */
     public static double getNextRandomValueByNormal(double average, double standardDeviation) {
         double z = 0;
         double x;
