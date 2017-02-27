@@ -46,6 +46,7 @@ public class ProcessManagerModule extends Module {
             simulation.addEvent(new Event(simulation.getClock() + normalValue,
                     query, EventType.EXIT, ModuleType.PROCESS_MANAGER_MODULE));
             query.getQueryStatistics().getProcessManagerStatistics().setTimeOfEntryToServer(simulation.getClock());
+            query.getQueryStatistics().getProcessManagerStatistics().setTimeOfExitFromModule(simulation.getClock()+normalValue);
 
             totalIdleTime += simulation.getClock() - idleTime;
         }
@@ -60,7 +61,7 @@ public class ProcessManagerModule extends Module {
     @Override
     public void processDeparture(Query query) {
         totalProcessedQueries++;
-        query.getQueryStatistics().getProcessManagerStatistics().setTimeOfExitFromModule(simulation.getClock());
+        //query.getQueryStatistics().getProcessManagerStatistics().setTimeOfExitFromModule(simulation.getClock());
         if (queue.size() > 0) {
 
             // 0.316227766 sqrt of 0.1
@@ -72,6 +73,7 @@ public class ProcessManagerModule extends Module {
 
             quer.getQueryStatistics().getProcessManagerStatistics().setTimeOfExitFromQueue(simulation.getClock());
             quer.getQueryStatistics().getProcessManagerStatistics().setTimeOfEntryToServer(simulation.getClock());
+            quer.getQueryStatistics().getProcessManagerStatistics().setTimeOfExitFromModule(simulation.getClock()+normalValue);
         } else {
             currentSystemCalls--;
             if (currentSystemCalls == 0)
@@ -80,7 +82,6 @@ public class ProcessManagerModule extends Module {
         }
         if (!query.isKill()) {
             nextModule.generateServiceEvent(query);
-
         } else {
             int actualConnections = simulation.getClientConnectionModule().getCurrentConnections() - 1;
             simulation.getClientConnectionModule().setCurrentConnections(actualConnections);
@@ -102,8 +103,6 @@ public class ProcessManagerModule extends Module {
             //momento en que sale de la cola
             query.getQueryStatistics().getProcessManagerStatistics().setTimeOfExitFromQueue(simulation.getClock());
             query.getQueryStatistics().getProcessManagerStatistics().setTimeOfExitFromModule(simulation.getClock());
-
-
         } else {
             query.setKill(true);
         }
@@ -160,9 +159,11 @@ public class ProcessManagerModule extends Module {
             if (query.getQueryType() == QueryType.DDL) {
                 double arrivalTime = query.getQueryStatistics().getProcessManagerStatistics().getTimeOfEntryToModule();
                 double exitTime = query.getQueryStatistics().getProcessManagerStatistics().getTimeOfExitFromModule();
-                totalTime += (exitTime - arrivalTime);
-                counter++;
-
+                double totalTimeInServer = exitTime-arrivalTime;
+                if (totalTimeInServer > 0) {
+                    counter++;
+                    totalTime += totalTimeInServer;
+                }
             }
 
         }
@@ -189,15 +190,18 @@ public class ProcessManagerModule extends Module {
             if (query.getQueryType() == QueryType.UPDATE) {
                 double arrivalTime = query.getQueryStatistics().getProcessManagerStatistics().getTimeOfEntryToModule();
                 double exitTime = query.getQueryStatistics().getProcessManagerStatistics().getTimeOfExitFromModule();
-                totalTime += (exitTime - arrivalTime);
-                counter++;
+                double totalTimeInServer = exitTime-arrivalTime;
+                if (totalTimeInServer > 0) {
+                    counter++;
+                    totalTime += totalTimeInServer;
+                }
 
             }
 
         }
 
         this.updateAvgTime = totalTime / counter;
-
+        java.lang.System.out.println(updateAvgTime);
     }
 
     /**
@@ -217,8 +221,11 @@ public class ProcessManagerModule extends Module {
             if (query.getQueryType() == QueryType.JOIN) {
                 double arrivalTime = query.getQueryStatistics().getProcessManagerStatistics().getTimeOfEntryToModule();
                 double exitTime = query.getQueryStatistics().getProcessManagerStatistics().getTimeOfExitFromModule();
-                totalTime += (exitTime - arrivalTime);
-                counter++;
+                double totalTimeInServer = exitTime-arrivalTime;
+                if (totalTimeInServer > 0) {
+                    counter++;
+                    totalTime += totalTimeInServer;
+                }
 
             }
 
@@ -244,8 +251,11 @@ public class ProcessManagerModule extends Module {
             if (query.getQueryType() == QueryType.SELECT) {
                 double arrivalTime = query.getQueryStatistics().getProcessManagerStatistics().getTimeOfEntryToModule();
                 double exitTime = query.getQueryStatistics().getProcessManagerStatistics().getTimeOfExitFromModule();
-                totalTime += (exitTime - arrivalTime);
-                counter++;
+                double totalTimeInServer = exitTime-arrivalTime;
+                if (totalTimeInServer > 0) {
+                    counter++;
+                    totalTime += totalTimeInServer;
+                }
 
             }
 

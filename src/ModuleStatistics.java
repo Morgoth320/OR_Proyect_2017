@@ -35,6 +35,10 @@ public class ModuleStatistics {
         this.averageOccupiedTimeRho = module.getAverageOccupiedTimeRho();
     }
 
+    /**
+     * Constructor used when making the averages of the data gathered from all the simulations.
+     * All of the values are set to defaults.
+     */
     public ModuleStatistics() {
         this.totalProcessedQueries = 0;
         this.averageQueueSize = 0;
@@ -92,7 +96,6 @@ public class ModuleStatistics {
     }
 
     public void setAverageQueryLifetime(double averageQueryLifetime) {
-
         this.averageQueryLifetime = averageQueryLifetime;
     }
 

@@ -11,6 +11,21 @@ import java.io.StringWriter;
  * Created by Ian on 18/2/2017.
  */
 public class Writer {
+
+    /**
+     * Static method used to write the general results of the simulation into an html file using the Apache Velocity library
+     * It takes the template for the index html from the templates folder, it then switches the values with the dollar sign
+     * in the html for the parameters passed. After that, for every simulation ran, it creates a hyperlink to the specific simulation
+     * and creates an html file for each one of them. Finally, the final result is written to a new html file in the statistics directory
+     * @param numberOfSimulations number of simulations ran
+     * @param maxTimePerSimulation maximum time allowed for the simulations to run
+     * @param kConnections maximum number of connections
+     * @param systemCalls maximum amount of system calls for the simulations
+     * @param nAvailableProcesses available processes for query processing
+     * @param pAvailableProcesses available processes for query transactions
+     * @param mAvailableProcesses available processes for query executions
+     * @param timeout timeout of the queries.
+     */
     public static void writeIndex(int numberOfSimulations, double maxTimePerSimulation, int kConnections, int systemCalls,
                                   int nAvailableProcesses, int pAvailableProcesses, int mAvailableProcesses, double timeout) {
         VelocityEngine ve = new VelocityEngine();

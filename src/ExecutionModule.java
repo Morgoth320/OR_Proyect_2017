@@ -6,6 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * This module executes all the orders and petitions that the query carries.
  */
 public class ExecutionModule extends Module {
+
     /**
      * The fixed amount of time taken for a DDL query type to execute.
      */
@@ -51,9 +52,13 @@ public class ExecutionModule extends Module {
                 totalIdleTime += simulation.getClock() - idleTime;
 
             currentSentences++;
-            double exitTime = simulation.getClock() + getTotalTime(query);
+            double time= getTotalTime(query);
+            double exitTime = simulation.getClock() +time;
+            //java.lang.System.out.println(time);
             simulation.addEvent(new Event(exitTime, query, EventType.EXIT, ModuleType.EXECUTION_MODULE));
             query.getQueryStatistics().getExecutionStatistics().setTimeOfEntryToServer(simulation.getClock());
+            query.getQueryStatistics().getExecutionStatistics().setTimeOfExitFromModule(exitTime);
+
         }
     }
 
@@ -65,14 +70,18 @@ public class ExecutionModule extends Module {
     @Override
     public void processDeparture(Query query) {
         totalProcessedQueries++;
-        query.getQueryStatistics().getExecutionStatistics().setTimeOfExitFromModule(simulation.getClock());
+       // query.getQueryStatistics().getExecutionStatistics().setTimeOfExitFromModule(simulation.getClock());
         if (queue.size() > 0) {
-            double exitTime = simulation.getClock() + getTotalTime(query);
+            double time=getTotalTime(query);
+            double exitTime = simulation.getClock() + time;
+           // java.lang.System.out.println(time);
             Query quer = queue.poll();
             quer.setIsInQueue(false);
             simulation.addEvent(new Event(exitTime, quer, EventType.EXIT, ModuleType.EXECUTION_MODULE));
             quer.getQueryStatistics().getExecutionStatistics().setTimeOfExitFromQueue(simulation.getClock());
             quer.getQueryStatistics().getExecutionStatistics().setTimeOfEntryToServer(simulation.getClock());
+            quer.getQueryStatistics().getExecutionStatistics().setTimeOfExitFromModule(exitTime);
+
         } else {
             currentSentences--;
             if (currentSentences == 0)
@@ -157,15 +166,16 @@ public class ExecutionModule extends Module {
         double totalTime = 0;
         int counter = 0;
         Iterator<Query> iterator = queryList.iterator();
-
         while (iterator.hasNext()) {
             Query query = iterator.next();
             if (query.getQueryType() == QueryType.DDL) {
                 double arrivalTime = query.getQueryStatistics().getExecutionStatistics().getTimeOfEntryToModule();
                 double exitTime = query.getQueryStatistics().getExecutionStatistics().getTimeOfExitFromModule();
-                totalTime += (exitTime - arrivalTime);
-                counter++;
-
+                double totalTimeInServer = exitTime - arrivalTime;
+                if (totalTimeInServer > 0) {
+                    counter++;
+                    totalTime += totalTimeInServer;
+                }
             }
 
         }
@@ -192,11 +202,12 @@ public class ExecutionModule extends Module {
             if (query.getQueryType() == QueryType.UPDATE) {
                 double arrivalTime = query.getQueryStatistics().getExecutionStatistics().getTimeOfEntryToModule();
                 double exitTime = query.getQueryStatistics().getExecutionStatistics().getTimeOfExitFromModule();
-                totalTime += (exitTime - arrivalTime);
-                counter++;
-
+                double totalTimeInServer = exitTime - arrivalTime;
+                if (totalTimeInServer > 0) {
+                    counter++;
+                    totalTime += totalTimeInServer;
+                }
             }
-
         }
         this.updateAvgTime = totalTime / counter;
     }
@@ -218,11 +229,12 @@ public class ExecutionModule extends Module {
             if (query.getQueryType() == QueryType.JOIN) {
                 double arrivalTime = query.getQueryStatistics().getExecutionStatistics().getTimeOfEntryToModule();
                 double exitTime = query.getQueryStatistics().getExecutionStatistics().getTimeOfExitFromModule();
-                totalTime += (exitTime - arrivalTime);
-                counter++;
-
+                double totalTimeInServer = exitTime - arrivalTime;
+                if (totalTimeInServer > 0) {
+                    counter++;
+                    totalTime += totalTimeInServer;
+                }
             }
-
         }
         this.joinAvgTime = totalTime / counter;
     }
@@ -244,11 +256,12 @@ public class ExecutionModule extends Module {
             if (query.getQueryType() == QueryType.SELECT) {
                 double arrivalTime = query.getQueryStatistics().getExecutionStatistics().getTimeOfEntryToModule();
                 double exitTime = query.getQueryStatistics().getExecutionStatistics().getTimeOfExitFromModule();
-                totalTime += (exitTime - arrivalTime);
-                counter++;
-
+                double totalTimeInServer = exitTime - arrivalTime;
+                if (totalTimeInServer > 0) {
+                    counter++;
+                    totalTime += totalTimeInServer;
+                }
             }
-
         }
         this.selectAvgTime = totalTime / counter;
     }
@@ -274,7 +287,6 @@ public class ExecutionModule extends Module {
         Iterator<Query> iterator = queryList.iterator();
         int counter = 0;
         double totalTime = 0;
-
         while (iterator.hasNext()) {
             Query query = iterator.next();
             double entryTimeToQueue = query.getQueryStatistics().getExecutionStatistics().getTimeOfEntryToQueue();
@@ -298,7 +310,6 @@ public class ExecutionModule extends Module {
         Iterator<Query> iterator = queryList.iterator();
         int counter = 0;
         double totalTime = 0;
-
         while (iterator.hasNext()) {
             Query query = iterator.next();
             double entryTimeToServer = query.getQueryStatistics().getExecutionStatistics().getTimeOfEntryToServer();

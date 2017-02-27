@@ -65,7 +65,6 @@ public class QueryModuleStatistics {
     }
 
     public void setTimeOfExitFromModule(double timeOfExitFromModule) {
-
         this.timeOfExitFromModule = timeOfExitFromModule;
     }
 

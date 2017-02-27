@@ -48,7 +48,7 @@ public class QueryProcessingModule extends Module {
             simulation.addEvent(new Event(simulation.getClock() + exitTime,
                     query, EventType.EXIT, ModuleType.QUERY_PROCESSING_MODULE));
             query.getQueryStatistics().getQueryProcessingStatistics().setTimeOfEntryToServer(simulation.getClock());
-
+            query.getQueryStatistics().getQueryProcessingStatistics().setTimeOfExitFromModule(simulation.getClock() + exitTime);
         }
     }
 
@@ -73,7 +73,7 @@ public class QueryProcessingModule extends Module {
     @Override
     public void processDeparture(Query query) {
         totalProcessedQueries++;
-        query.getQueryStatistics().getQueryProcessingStatistics().setTimeOfExitFromModule(simulation.getClock());
+        //query.getQueryStatistics().getQueryProcessingStatistics().setTimeOfExitFromModule(simulation.getClock());
         if (queue.size() > 0) {
             double exitTime = timeInQueryProcessingModule(queue.peek().getQueryType());
             Query query1 = queue.poll();
@@ -82,6 +82,7 @@ public class QueryProcessingModule extends Module {
                     query1, EventType.EXIT, ModuleType.QUERY_PROCESSING_MODULE));
             query1.getQueryStatistics().getQueryProcessingStatistics().setTimeOfExitFromQueue(simulation.getClock());
             query1.getQueryStatistics().getQueryProcessingStatistics().setTimeOfEntryToServer(simulation.getClock());
+            query1.getQueryStatistics().getQueryProcessingStatistics().setTimeOfExitFromModule(simulation.getClock()+exitTime);
         } else {
             currentProcesses--;
             if (currentProcesses == 0)
@@ -110,7 +111,6 @@ public class QueryProcessingModule extends Module {
             //momento en que sale de la cola
             query.getQueryStatistics().getQueryProcessingStatistics().setTimeOfExitFromQueue(simulation.getClock());
             query.getQueryStatistics().getQueryProcessingStatistics().setTimeOfExitFromModule(simulation.getClock());
-
             int actualConnections = simulation.getClientConnectionModule().getCurrentConnections() - 1;
             simulation.getClientConnectionModule().setCurrentConnections(actualConnections);
 
@@ -161,8 +161,11 @@ public class QueryProcessingModule extends Module {
             if (query.getQueryType() == QueryType.DDL) {
                 double arrivalTime = query.getQueryStatistics().getQueryProcessingStatistics().getTimeOfEntryToModule();
                 double exitTime = query.getQueryStatistics().getQueryProcessingStatistics().getTimeOfExitFromModule();
-                totalTime += (exitTime - arrivalTime);
-                counter++;
+                double totalTimeInServer = exitTime-arrivalTime;
+                if (totalTimeInServer > 0) {
+                    counter++;
+                    totalTime += totalTimeInServer;
+                }
 
             }
 
@@ -192,11 +195,8 @@ public class QueryProcessingModule extends Module {
                 double exitTime = query.getQueryStatistics().getQueryProcessingStatistics().getTimeOfExitFromModule();
                 totalTime += (exitTime - arrivalTime);
                 counter++;
-
             }
-
         }
-
         this.updateAvgTime = totalTime / counter;
     }
 
@@ -211,7 +211,6 @@ public class QueryProcessingModule extends Module {
         double totalTime = 0;
         int counter = 0;
         Iterator<Query> iterator = queryList.iterator();
-
         while (iterator.hasNext()) {
             Query query = iterator.next();
             if (query.getQueryType() == QueryType.JOIN) {
@@ -219,11 +218,8 @@ public class QueryProcessingModule extends Module {
                 double exitTime = query.getQueryStatistics().getQueryProcessingStatistics().getTimeOfExitFromModule();
                 totalTime += (exitTime - arrivalTime);
                 counter++;
-
             }
-
         }
-
         this.joinAvgTime = totalTime / counter;
     }
 
@@ -246,11 +242,8 @@ public class QueryProcessingModule extends Module {
                 double exitTime = query.getQueryStatistics().getQueryProcessingStatistics().getTimeOfExitFromModule();
                 totalTime += (exitTime - arrivalTime);
                 counter++;
-
             }
-
         }
-
         this.selectAvgTime = totalTime / counter;
     }
 
@@ -345,10 +338,6 @@ public class QueryProcessingModule extends Module {
      *
      * @param lambda the mean arrival rate
      */
-    @Override
-    public void fillStatistics(double lambda) {
-
-    }
 
     /**
      * Calculates the amount of validation time of a specific query inside the Query Processing Module.

@@ -46,7 +46,7 @@ public class DistributionGenerator {
      * Uses the inverse transform sampling with the uniform distribution to generate a random value.
      *
      * @param a Is the lowest value.
-     * @param b Is the higer value.
+     * @param b Is the higher value.
      * @return A random value belonging to the interval [a , b].
      */
     public static double getNextRandomValueByUniform(double a, double b) {

@@ -66,19 +66,22 @@ public class TransactionAndDataAccessModule extends Module {
                     // si la consulta es DDL pero no hay queries
                     currentProcessedQueries++;
                     // Agregar el tiempo Respectivo que se debe sumar al clock
-                    simulation.addEvent(new Event(simulation.getClock() + (getBlockNumber(query.getQueryType()) * 0.1),
+                    double time=getTotalTime(pendingQuery);
+                    simulation.addEvent(new Event(simulation.getClock() + time,
                             pendingQuery, EventType.EXIT, ModuleType.TRANSACTION_AND_DATA_ACCESS_MODULE));
-                    query.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfEntryToServer(simulation.getClock());
-
+                    pendingQuery.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfEntryToServer(simulation.getClock());
+                    pendingQuery.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfExitFromModule(simulation.getClock() + time);
                 }
 
             } else {
                 // si la consulta no es DDL => atienda
                 currentProcessedQueries++;
                 // Agregar el tiempo Respectivo que se debe sumar al clock
-                simulation.addEvent(new Event((simulation.getClock() + (getBlockNumber(query.getQueryType())) * 0.1),
+                double time=getTotalTime(query);
+                simulation.addEvent(new Event((simulation.getClock() +time) ,
                         query, EventType.EXIT, ModuleType.TRANSACTION_AND_DATA_ACCESS_MODULE)); //REVISAR
                 query.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfEntryToServer(simulation.getClock());
+                query.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfExitFromModule(simulation.getClock()+time);
 
             }
         }
@@ -106,7 +109,7 @@ public class TransactionAndDataAccessModule extends Module {
     //Si el que sale es DDL y el que sigue no es DDL, entonces desbloquear,
     public void processDeparture(Query query) {
         totalProcessedQueries++;
-        query.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfExitFromModule(simulation.getClock());
+        //query.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfExitFromModule(simulation.getClock());
         if (query.getQueryType() == QueryType.DDL) {
             blocked = false;
         }
@@ -118,7 +121,8 @@ public class TransactionAndDataAccessModule extends Module {
                 while (currentProcessedQueries < pQueries && queue.size() > 0 && queue.peek().getQueryType() != QueryType.DDL) {
                     Query quer = queue.poll();
                     quer.setIsInQueue(false);
-                    simulation.addEvent(new Event(simulation.getClock() + (getBlockNumber(query.getQueryType())) * 0.1, quer, EventType.EXIT, ModuleType.TRANSACTION_AND_DATA_ACCESS_MODULE));
+                    double time=getTotalTime(quer);
+                    simulation.addEvent(new Event(simulation.getClock() + time, quer, EventType.EXIT, ModuleType.TRANSACTION_AND_DATA_ACCESS_MODULE));
                     currentProcessedQueries++;
                     quer.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfExitFromQueue(simulation.getClock());
                     quer.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfEntryToServer(simulation.getClock());
@@ -127,30 +131,40 @@ public class TransactionAndDataAccessModule extends Module {
                     blocked = true;
                     pendingQuery = queue.poll();
                     if (currentProcessedQueries == 0) {
-                        simulation.addEvent(new Event(simulation.getClock() + (getBlockNumber(query.getQueryType())) * 0.1, pendingQuery, EventType.EXIT, ModuleType.TRANSACTION_AND_DATA_ACCESS_MODULE));
+                        double time=getTotalTime(pendingQuery);
+                        simulation.addEvent(new Event(simulation.getClock() + time, pendingQuery, EventType.EXIT, ModuleType.TRANSACTION_AND_DATA_ACCESS_MODULE));
                         currentProcessedQueries++;
                         pendingQuery.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfExitFromQueue(simulation.getClock());
                         pendingQuery.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfEntryToServer(simulation.getClock());
+                        pendingQuery.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfExitFromModule(simulation.getClock()+time);
+
                     }
                 }
             } else {
-                simulation.addEvent(new Event(simulation.getClock() + (getBlockNumber(query.getQueryType())) * 0.1,
+                double time=getTotalTime(pendingQuery);
+                simulation.addEvent(new Event(simulation.getClock() + time,
                         pendingQuery, EventType.EXIT, ModuleType.TRANSACTION_AND_DATA_ACCESS_MODULE));
 
                 currentProcessedQueries++;
                 pendingQuery.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfExitFromQueue(simulation.getClock());
                 pendingQuery.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfEntryToServer(simulation.getClock());
+                pendingQuery.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfExitFromModule(simulation.getClock()+time);
+
                 pendingQuery = null;
             }
         } else {
             if (currentProcessedQueries == 0) {
                 if (blocked) {
                     //Ejecuta consulta pendinte
-                    simulation.addEvent(new Event(simulation.getClock() + (getBlockNumber(query.getQueryType())) * 0.1,
+
+                    double time=getTotalTime(pendingQuery);
+                    simulation.addEvent(new Event(simulation.getClock() + time,
                             pendingQuery, EventType.EXIT, ModuleType.TRANSACTION_AND_DATA_ACCESS_MODULE));
                     currentProcessedQueries++;
                     pendingQuery.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfExitFromQueue(simulation.getClock());
                     pendingQuery.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfEntryToServer(simulation.getClock());
+                    pendingQuery.getQueryStatistics().getTransactionAndDataAccessStatistics().setTimeOfExitFromModule(simulation.getClock()+time);
+
                     pendingQuery = null;
                 } else {
                     idleTime = simulation.getClock();
@@ -239,8 +253,11 @@ public class TransactionAndDataAccessModule extends Module {
             if (query.getQueryType() == QueryType.DDL) {
                 double arrivalTime = query.getQueryStatistics().getTransactionAndDataAccessStatistics().getTimeOfEntryToModule();
                 double exitTime = query.getQueryStatistics().getTransactionAndDataAccessStatistics().getTimeOfExitFromModule();
-                totalTime += (exitTime - arrivalTime);
-                counter++;
+                double totalTimeInServer = exitTime-arrivalTime;
+                if (totalTimeInServer > 0) {
+                    counter++;
+                    totalTime += totalTimeInServer;
+                }
 
             }
 
@@ -262,19 +279,18 @@ public class TransactionAndDataAccessModule extends Module {
         double totalTime = 0;
         int counter = 0;
         Iterator<Query> iterator = queryList.iterator();
-
         while (iterator.hasNext()) {
             Query query = iterator.next();
             if (query.getQueryType() == QueryType.UPDATE) {
                 double arrivalTime = query.getQueryStatistics().getTransactionAndDataAccessStatistics().getTimeOfEntryToModule();
                 double exitTime = query.getQueryStatistics().getTransactionAndDataAccessStatistics().getTimeOfExitFromModule();
-                totalTime += (exitTime - arrivalTime);
-                counter++;
-
+                double totalTimeInServer = exitTime-arrivalTime;
+                if (totalTimeInServer > 0) {
+                    counter++;
+                    totalTime += totalTimeInServer;
+                }
             }
-
         }
-
         this.updateAvgTime = totalTime / counter;
     }
 
@@ -295,11 +311,12 @@ public class TransactionAndDataAccessModule extends Module {
             if (query.getQueryType() == QueryType.JOIN) {
                 double arrivalTime = query.getQueryStatistics().getTransactionAndDataAccessStatistics().getTimeOfEntryToModule();
                 double exitTime = query.getQueryStatistics().getTransactionAndDataAccessStatistics().getTimeOfExitFromModule();
-                totalTime += (exitTime - arrivalTime);
-                counter++;
-
+                double totalTimeInServer = exitTime-arrivalTime;
+                if (totalTimeInServer > 0) {
+                    counter++;
+                    totalTime += totalTimeInServer;
+                }
             }
-
         }
 
         this.joinAvgTime = totalTime / counter;
@@ -322,11 +339,12 @@ public class TransactionAndDataAccessModule extends Module {
             if (query.getQueryType() == QueryType.SELECT) {
                 double arrivalTime = query.getQueryStatistics().getTransactionAndDataAccessStatistics().getTimeOfEntryToModule();
                 double exitTime = query.getQueryStatistics().getTransactionAndDataAccessStatistics().getTimeOfExitFromModule();
-                totalTime += (exitTime - arrivalTime);
-                counter++;
-
+                double totalTimeInServer = exitTime-arrivalTime;
+                if (totalTimeInServer > 0) {
+                    counter++;
+                    totalTime += totalTimeInServer;
+                }
             }
-
         }
 
         this.selectAvgTime = totalTime / counter;
