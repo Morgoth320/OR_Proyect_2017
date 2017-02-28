@@ -26,7 +26,6 @@ import java.util.Iterator;
  * Created by Paola Ortega S on 2/8/2017.
  */
 public class GUI extends JFrame {
-    private System system;
     private final String TITLE = "Simulation";
     private final String NUMBER_OF_SIMULATIONS = "Number of simulations";
     private final String MAX_TIME_PER_SIMULATION = "Maximum time to run the simulation";
@@ -37,83 +36,52 @@ public class GUI extends JFrame {
     private final String P_AVAILABLE_PROCESSES = "Number of available processes for query transactions (p)";
     private final String M_AVAILABLE_PROCESSES = "Number of available processes for query executions (m)";
     private final String T_TIMEOUT = "Connection timeout (t)";
-    private final String DELAY = "Delay";
+    private final String DELAY = "Delay (in seconds)";
     private final String START = "Start";
     private final String O_FORTUNA = "O Fortuna!";
 
-    private JPanel panelNumberOfSimulations;
-    private JLabel lblNumberOfSimulations;
     private JTextField txtNumberOfSimulations;
-
-    private JPanel panelMaxTimePerSimulation;
-    private JLabel lblMaxTimePerSimulation;
     private JTextField txtMaxTimePerSimulation;
-
-    private JPanel panelSlowMode;
-    private JLabel lblSlowMode;
-    private JCheckBox chkSlowMode;
-
-    private JPanel panelDelay;
-    private JLabel lblDelay;
     private JTextField txtDelay;
-
-    private JPanel panelKConnections;
-    private JLabel lblKConnections;
     private JTextField txtKConnections;
-
-    private JPanel panelSystemCalls;
-    private JLabel lblSystemCalls;
     private JTextField txtSystemCalls;
-
-    private JPanel panelNAvailableProcesses;
-    private JLabel lblNAvailableProcesses;
     private JTextField txtNAvailableProcesses;
-
-    private JPanel panelPAvailableProcesses;
-    private JLabel lblPAvailableProcesses;
     private JTextField txtPAvailableProcesses;
-
-    private JPanel panelMAvailableProcesses;
-    private JLabel lblMAvailableProcesses;
     private JTextField txtMAvailableProcesses;
-
-    private JPanel panelTimeout;
-    private JLabel lblTimeout;
     private JTextField txtTimeout;
 
-    private JPanel panelFortuna;
+    private JCheckBox chkSlowMode;
     private JCheckBox chkFortuna;
 
-    private JPanel panelStart;
-    private JButton btnStart;
-
     private JTextArea txtDataDisplay;
+
+    private System system;
     private int numberOfSimulations;
 
     public GUI() {
         super.setTitle(TITLE);
         super.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        lblNumberOfSimulations = new JLabel(NUMBER_OF_SIMULATIONS);
+        JLabel lblNumberOfSimulations = new JLabel(NUMBER_OF_SIMULATIONS);
         lblNumberOfSimulations.setFont(new Font("Normal", Font.BOLD, 18));
         txtNumberOfSimulations = new JTextField();
         txtNumberOfSimulations.setFont(new Font("Normal", Font.BOLD, 18));
         txtNumberOfSimulations.setColumns(20);
-        panelNumberOfSimulations = new JPanel();
+        JPanel panelNumberOfSimulations = new JPanel();
         panelNumberOfSimulations.setLayout(new BorderLayout());
         panelNumberOfSimulations.add(lblNumberOfSimulations, BorderLayout.WEST);
         panelNumberOfSimulations.add(txtNumberOfSimulations, BorderLayout.EAST);
 
-        lblMaxTimePerSimulation = new JLabel(MAX_TIME_PER_SIMULATION);
+        JLabel lblMaxTimePerSimulation = new JLabel(MAX_TIME_PER_SIMULATION);
         lblMaxTimePerSimulation.setFont(new Font("Normal", Font.BOLD, 18));
         txtMaxTimePerSimulation = new JTextField();
         txtMaxTimePerSimulation.setColumns(20);
         txtMaxTimePerSimulation.setFont(new Font("Normal", Font.BOLD, 18));
-        panelMaxTimePerSimulation = new JPanel();
+        JPanel panelMaxTimePerSimulation = new JPanel();
         panelMaxTimePerSimulation.setLayout(new BorderLayout());
         panelMaxTimePerSimulation.add(lblMaxTimePerSimulation, BorderLayout.WEST);
         panelMaxTimePerSimulation.add(txtMaxTimePerSimulation, BorderLayout.EAST);
 
-        lblSlowMode = new JLabel(SLOW_MODE);
+        JLabel lblSlowMode = new JLabel(SLOW_MODE);
         lblSlowMode.setFont(new Font("Normal", Font.BOLD, 18));
         chkSlowMode = new JCheckBox();
         chkSlowMode.setSelected(false);
@@ -127,91 +95,91 @@ public class GUI extends JFrame {
                 }
             }
         });
-        panelSlowMode = new JPanel();
+        JPanel panelSlowMode = new JPanel();
         panelSlowMode.setLayout(new BorderLayout());
         panelSlowMode.add(lblSlowMode, BorderLayout.WEST);
         panelSlowMode.add(chkSlowMode, BorderLayout.EAST);
 
-        lblDelay = new JLabel(DELAY);
+        JLabel lblDelay = new JLabel(DELAY);
         lblDelay.setFont(new Font("Normal", Font.BOLD, 18));
         txtDelay = new JTextField();
         txtDelay.setFont(new Font("Normal", Font.BOLD, 18));
         txtDelay.setColumns(20);
         txtDelay.setEnabled(false);
-        panelDelay = new JPanel();
+        JPanel panelDelay = new JPanel();
         panelDelay.setLayout(new BorderLayout());
         panelDelay.add(lblDelay, BorderLayout.WEST);
         panelDelay.add(txtDelay, BorderLayout.EAST);
 
-        lblKConnections = new JLabel(K_CONNECTIONS);
+        JLabel lblKConnections = new JLabel(K_CONNECTIONS);
         lblKConnections.setFont(new Font("Normal", Font.BOLD, 18));
         txtKConnections = new JTextField();
         txtKConnections.setColumns(20);
         txtKConnections.setFont(new Font("Normal", Font.BOLD, 18));
-        panelKConnections = new JPanel();
+        JPanel panelKConnections = new JPanel();
         panelKConnections.setLayout(new BorderLayout());
         panelKConnections.add(lblKConnections, BorderLayout.WEST);
         panelKConnections.add(txtKConnections, BorderLayout.EAST);
 
-        lblSystemCalls = new JLabel(SYSTEM_CALLS);
+        JLabel lblSystemCalls = new JLabel(SYSTEM_CALLS);
         lblSystemCalls.setFont(new Font("Normal", Font.BOLD, 18));
         txtSystemCalls = new JTextField();
         txtSystemCalls.setColumns(20);
         txtSystemCalls.setFont(new Font("Normal", Font.BOLD, 18));
-        panelSystemCalls = new JPanel();
+        JPanel panelSystemCalls = new JPanel();
         panelSystemCalls.setLayout(new BorderLayout());
         panelSystemCalls.add(lblSystemCalls, BorderLayout.WEST);
         panelSystemCalls.add(txtSystemCalls, BorderLayout.EAST);
 
-        lblNAvailableProcesses = new JLabel(N_AVAILABLE_PROCESSES);
+        JLabel lblNAvailableProcesses = new JLabel(N_AVAILABLE_PROCESSES);
         lblNAvailableProcesses.setFont(new Font("Normal", Font.BOLD, 18));
         txtNAvailableProcesses = new JTextField();
         txtNAvailableProcesses.setColumns(20);
         txtNAvailableProcesses.setFont(new Font("Normal", Font.BOLD, 18));
-        panelNAvailableProcesses = new JPanel();
+        JPanel panelNAvailableProcesses = new JPanel();
         panelNAvailableProcesses.setLayout(new BorderLayout());
         panelNAvailableProcesses.add(lblNAvailableProcesses, BorderLayout.WEST);
         panelNAvailableProcesses.add(txtNAvailableProcesses, BorderLayout.EAST);
 
-        lblPAvailableProcesses = new JLabel(P_AVAILABLE_PROCESSES);
+        JLabel lblPAvailableProcesses = new JLabel(P_AVAILABLE_PROCESSES);
         lblPAvailableProcesses.setFont(new Font("Normal", Font.BOLD, 18));
         txtPAvailableProcesses = new JTextField();
         txtPAvailableProcesses.setColumns(20);
         txtPAvailableProcesses.setFont(new Font("Normal", Font.BOLD, 18));
-        panelPAvailableProcesses = new JPanel();
+        JPanel panelPAvailableProcesses = new JPanel();
         panelPAvailableProcesses.setLayout(new BorderLayout());
         panelPAvailableProcesses.add(lblPAvailableProcesses, BorderLayout.WEST);
         panelPAvailableProcesses.add(txtPAvailableProcesses, BorderLayout.EAST);
 
-        lblMAvailableProcesses = new JLabel(M_AVAILABLE_PROCESSES);
+        JLabel lblMAvailableProcesses = new JLabel(M_AVAILABLE_PROCESSES);
         lblMAvailableProcesses.setFont(new Font("Normal", Font.BOLD, 18));
         txtMAvailableProcesses = new JTextField();
         txtMAvailableProcesses.setColumns(20);
         txtMAvailableProcesses.setFont(new Font("Normal", Font.BOLD, 18));
-        panelMAvailableProcesses = new JPanel();
+        JPanel panelMAvailableProcesses = new JPanel();
         panelMAvailableProcesses.setLayout(new BorderLayout());
         panelMAvailableProcesses.add(lblMAvailableProcesses, BorderLayout.WEST);
         panelMAvailableProcesses.add(txtMAvailableProcesses, BorderLayout.EAST);
 
-        lblTimeout = new JLabel(T_TIMEOUT);
+        JLabel lblTimeout = new JLabel(T_TIMEOUT);
         lblTimeout.setFont(new Font("Normal", Font.BOLD, 18));
         txtTimeout = new JTextField();
         txtTimeout.setColumns(20);
         txtTimeout.setFont(new Font("Normal", Font.BOLD, 18));
-        panelTimeout = new JPanel();
+        JPanel panelTimeout = new JPanel();
         panelTimeout.setLayout(new BorderLayout());
         panelTimeout.add(lblTimeout, BorderLayout.WEST);
         panelTimeout.add(txtTimeout, BorderLayout.EAST);
 
         chkFortuna = new JCheckBox(O_FORTUNA);
         chkFortuna.setFont(new Font("Normal", Font.BOLD, 18));
-        panelFortuna = new JPanel();
+        JPanel panelFortuna = new JPanel();
         panelFortuna.add(chkFortuna);
 
-        btnStart = new JButton(START);
+        JButton btnStart = new JButton(START);
         btnStart.setSize(100, 100);
         btnStart.setFont(new Font("Normal", Font.BOLD, 18));
-        panelStart = new JPanel();
+        JPanel panelStart = new JPanel();
         panelStart.add(btnStart);
 
         btnStart.addActionListener(new ActionListener() {
@@ -228,16 +196,23 @@ public class GUI extends JFrame {
                     if (chkSlowMode.isSelected())
                         delay = Double.parseDouble(txtDelay.getText());
 
+                    final double toUseDelay = delay;
                     int kConnections = Integer.parseInt(txtKConnections.getText());
                     int availableSystemCalls = Integer.parseInt(txtSystemCalls.getText());
                     int nAvailableProcesses = Integer.parseInt(txtNAvailableProcesses.getText());
                     int pAvailableProcesses = Integer.parseInt(txtPAvailableProcesses.getText());
                     int mAvailableProcesses = Integer.parseInt(txtMAvailableProcesses.getText());
                     double timeout = Double.parseDouble(txtTimeout.getText());
-                    system = new System(numberOfSimulations, delay, kConnections, availableSystemCalls,
-                            nAvailableProcesses, pAvailableProcesses, mAvailableProcesses, timeout, maxTimePerSimulation);
-                    displayLiveStatistics();
-                    system.startSimulations(txtDataDisplay);
+                    Runnable toRun = new Runnable() {
+                        @Override
+                        public void run() {
+                            system = new System(numberOfSimulations, toUseDelay, kConnections, availableSystemCalls,
+                                    nAvailableProcesses, pAvailableProcesses, mAvailableProcesses, timeout, maxTimePerSimulation);
+                            displayLiveStatistics();
+                            system.startSimulations(txtDataDisplay);
+                        }
+                    };
+                    new Thread(toRun).start();
                 } else {
                     JDialog nonValidParametersDialog = new JDialog();
                     JLabel message = new JLabel("One or more parameters are either missing or are not valid");
@@ -268,7 +243,6 @@ public class GUI extends JFrame {
         Border padding = BorderFactory.createEmptyBorder(15, 15, 15, 15);
         mainPanel.setBorder(padding);
 
-
         super.add(mainPanel);
         super.setSize(900, 900);
         //super.setResizable(false);
@@ -286,7 +260,7 @@ public class GUI extends JFrame {
 
     private void displayLiveStatistics() {
         txtDataDisplay = new JTextArea();
-        txtDataDisplay.setFont(new Font("Normal", Font.BOLD, 15));
+        txtDataDisplay.setFont(new Font("Normal", Font.BOLD, 12));
         txtDataDisplay.setEditable(false);
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
@@ -308,11 +282,11 @@ public class GUI extends JFrame {
     public void displayAllFinalSimulationResults(){
         Iterator<Statistics> iterator = system.getAllStatistics().iterator();
         displayFinalSimulationResult(1, iterator.next());
-        /*int i = 1;
+        int i = 1;
         while (iterator.hasNext()){
             displayFinalSimulationResult(i, iterator.next());
             i++;
-        }*/
+        }
     }
 
     public void displayFinalSimulationResult(int simulationNumber, Statistics statistics) {
@@ -475,6 +449,5 @@ public class GUI extends JFrame {
 
     public static void main(String... args) {
         GUI gui = new GUI();
-
     }
 }

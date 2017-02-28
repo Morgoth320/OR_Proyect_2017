@@ -176,7 +176,7 @@ public class Simulation {
                 "Processed queries: " + clientConnectionModule.getTotalProcessedQueries() + "\n\n";
 
         String processManagerData = "Process Manager Module: \n" +
-                "Occupied servers: " + processManagerModule + "\n" +
+                "Occupied servers: " + processManagerModule.getCurrentSystemCalls()+ "\n" +
                 "Free Servers: " + processManagerModule.getNumberOfFreeServers() + "\n" +
                 "Size of the Queue: " + processManagerModule.getQueueSize() + "\n" +
                 "Processed queries: " + processManagerModule.getTotalProcessedQueries() + "\n\n";
@@ -189,7 +189,7 @@ public class Simulation {
 
         String transactionAndDataAccessData = "Transaction and Data Access Module: \n" +
                 "Occupied servers: " + transactionAndDataAccessModule.getCurrentProcesses() + "\n" +
-                "Free Servers: " + clientConnectionModule.getNumberOfFreeServers() + "\n" +
+                "Free Servers: " + transactionAndDataAccessModule.getNumberOfFreeServers() + "\n" +
                 "Size of the Queue: " + transactionAndDataAccessModule.getQueueSize() + "\n" +
                 "Processed queries: " + transactionAndDataAccessModule.getTotalProcessedQueries() + "\n\n";
 

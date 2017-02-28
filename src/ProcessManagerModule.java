@@ -353,4 +353,7 @@ public class ProcessManagerModule extends Module {
         averageQueriesInService = ClientConnectionModule.LAMBDA * averageTimeInService;
     }
 
+    public int getCurrentSystemCalls(){
+        return currentSystemCalls;
+    }
 }
