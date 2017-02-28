@@ -1,19 +1,7 @@
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JCheckBox;
-import javax.swing.JTextArea;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.WindowConstants;
 import java.awt.Font;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -280,29 +268,39 @@ public class GUI extends JFrame {
     }
 
     public void displayAllFinalSimulationResults(){
+        JTabbedPane tabbedPane = new JTabbedPane();
         Iterator<Statistics> iterator = system.getAllStatistics().iterator();
-        displayFinalSimulationResult(1, iterator.next());
-        int i = 1;
-        while (iterator.hasNext()){
-            displayFinalSimulationResult(i, iterator.next());
-            i++;
+        int counter = 0;
+        while(iterator.hasNext()){
+            Statistics statistic = iterator.next();
+            tabbedPane.addTab("Simulation " + (counter + 1), displayFinalSimulationResult(counter + 1,statistic));
+            counter++;
         }
+        Statistics generalStatistics = new Statistics(system.getAllStatistics());
+        JPanel lastAveragePanel = displayFinalSimulationResult(0, generalStatistics);
+        tabbedPane.addTab("Final Average", lastAveragePanel);
+        changeLayout(tabbedPane);
     }
 
-    public void displayFinalSimulationResult(int simulationNumber, Statistics statistics) {
+    public JPanel displayFinalSimulationResult(int simulationNumber, Statistics statistics) {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
         JPanel panelSimulation = new JPanel();
         panelSimulation.setLayout(new FlowLayout());
-        JLabel lblSimulation = new JLabel("Simulation number: ");
-        lblSimulation.setFont(new Font("Normal", Font.BOLD, 20));
-        JTextField txtSimulationNumber = new JTextField("" + simulationNumber);
-        txtSimulationNumber.setFont(new Font("Normal", Font.BOLD, 20));
-        txtSimulationNumber.setEditable(false);
+        JLabel lblSimulation = new JLabel();
         panelSimulation.add(lblSimulation);
-        panelSimulation.add(txtSimulationNumber);
+        if(simulationNumber != 0) {
+            lblSimulation.setText("Simulation number: ");
+            JTextField txtSimulationNumber = new JTextField("" + simulationNumber);
+            txtSimulationNumber.setFont(new Font("Normal", Font.BOLD, 20));
+            txtSimulationNumber.setEditable(false);
 
+            panelSimulation.add(txtSimulationNumber);
+        }else{
+            lblSimulation.setText("Final result");
+        }
+        lblSimulation.setFont(new Font("Normal", Font.BOLD, 20));
         JPanel panelConnectionLife = new JPanel(new FlowLayout());
         JLabel lblConnectionLife = new JLabel("Average connection lifetime: ");
         lblConnectionLife.setFont(new Font("Normal", Font.BOLD, 20));
@@ -389,7 +387,8 @@ public class GUI extends JFrame {
         mainPanel.add(panelRejectedConnections);
         mainPanel.add(panelAveragePerModuleTitle);
         mainPanel.add(panelAveragePerModule);
-        changeLayout(mainPanel);
+        //changeLayout(mainPanel);
+        return mainPanel;
     }
 
     private boolean areParametersValid() {
